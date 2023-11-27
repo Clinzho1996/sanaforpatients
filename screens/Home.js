@@ -71,10 +71,6 @@ const Home = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    if (!userId) {
-      // If userId is not available yet, return from this function
-      return;
-    }
     const fetchMedicationData = async () => {
       const token = await AsyncStorage.getItem('userToken');
 
@@ -169,21 +165,27 @@ const Home = ({navigation}) => {
       setIsLoading(false);
     }
   };
-  const renderEmptyData = () => (
-    <View
-      style={{
-        alignItems: 'center',
-        marginTop: 20,
-        flex: 1,
-        justifyContent: 'center',
-        paddingHorizontal: 40,
-      }}>
-      <Text style={{color: '#000', fontSize: 16, textAlign: 'center'}}>
-        First you have to add your medication reminder by tapping the '+'
-        button.
-      </Text>
-    </View>
-  );
+
+  const renderEmptyData = () => {
+    if (Object.keys(reminderData).length === 0) {
+      return (
+        <View
+          style={{
+            alignItems: 'center',
+            marginTop: 20,
+            flex: 1,
+            justifyContent: 'center',
+            paddingHorizontal: 40,
+          }}>
+          <Text style={{color: '#000', fontSize: 16, textAlign: 'center'}}>
+            First you have to add your medication reminder by tapping the '+'
+            button.
+          </Text>
+        </View>
+      );
+    }
+    return null;
+  };
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
