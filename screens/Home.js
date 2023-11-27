@@ -16,19 +16,16 @@ const width = Dimensions.get('window').width;
 
 const Home = ({navigation}) => {
   const [reminderData, setReminderData] = useState({});
-  const [visible, setVisible] = React.useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [disabledStates, setDisabledStates] = useState({});
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const showModal = itemId => {
-    setVisible(true);
     setSelectedItemId(itemId);
     setButtonDisabled(true);
   };
 
   const hideModal = () => {
-    setVisible(false);
     setSelectedItemId(null);
     setButtonDisabled(false);
   };
@@ -71,6 +68,10 @@ const Home = ({navigation}) => {
   }, []);
 
   useEffect(() => {
+    if (!userId) {
+      // If userId is not available yet, return from this function
+      return;
+    }
     const fetchMedicationData = async () => {
       const token = await AsyncStorage.getItem('userToken');
 
@@ -165,27 +166,21 @@ const Home = ({navigation}) => {
       setIsLoading(false);
     }
   };
-
-  const renderEmptyData = () => {
-    if (Object.keys(reminderData).length === 0) {
-      return (
-        <View
-          style={{
-            alignItems: 'center',
-            marginTop: 20,
-            flex: 1,
-            justifyContent: 'center',
-            paddingHorizontal: 40,
-          }}>
-          <Text style={{color: '#000', fontSize: 16, textAlign: 'center'}}>
-            First you have to add your medication reminder by tapping the '+'
-            button.
-          </Text>
-        </View>
-      );
-    }
-    return null;
-  };
+  const renderEmptyData = () => (
+    <View
+      style={{
+        alignItems: 'center',
+        marginTop: 20,
+        flex: 1,
+        justifyContent: 'center',
+        paddingHorizontal: 40,
+      }}>
+      <Text style={{color: '#000', fontSize: 16, textAlign: 'center'}}>
+        First you have to add your medication reminder by tapping the '+'
+        button.
+      </Text>
+    </View>
+  );
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -239,7 +234,7 @@ const Home = ({navigation}) => {
                 key={item.id.toString()}>
                 <Portal>
                   <Modal
-                    visible={visible}
+                    visible={selectedItemId === item.id}
                     onDismiss={hideModal}
                     contentContainerStyle={containerStyle}>
                     <View style={{backgroundColor: 'white', padding: 20}}>
@@ -265,7 +260,7 @@ const Home = ({navigation}) => {
                             hideModal();
                             const updatedDisabledStates = {
                               ...disabledStates,
-                              [item.id]: true,
+                              [item.id]: true, // Update the disabled state for the specific item
                             };
                             setDisabledStates(updatedDisabledStates);
                             handleMedicationTaken(item.id);
@@ -280,7 +275,9 @@ const Home = ({navigation}) => {
                           <Text style={{color: '#fff'}}>Yes</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          onPress={hideModal}
+                          onPress={() => {
+                            hideModal(item.id);
+                          }}
                           style={{color: '#1654CC'}}>
                           <Text style={{color: '#1654CC'}}>No</Text>
                         </TouchableOpacity>
@@ -331,7 +328,7 @@ const Home = ({navigation}) => {
                           borderRadius: 20,
                           opacity: item.taken ? 0.6 : 1,
                         }}
-                        disabled={buttonDisabled || item.taken}>
+                        disabled={item.taken}>
                         <Text style={{color: '#fff', fontSize: 12}}>
                           {item.taken ? 'Taken' : 'Take now'}
                         </Text>
