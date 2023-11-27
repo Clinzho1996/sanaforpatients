@@ -48,8 +48,6 @@ const Login = ({navigation}) => {
       );
       console.log('Login: ', response.data);
       await AsyncStorage.setItem('userToken', response.data.access);
-      console.log('User Token:', response.data.access);
-      await AsyncStorage.setItem('refreshToken', response.data.refresh);
       navigation.navigate('Main');
     } catch (error) {
       console.log('Error:', error);

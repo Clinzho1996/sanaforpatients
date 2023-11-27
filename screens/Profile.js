@@ -23,8 +23,8 @@ const height = Dimensions.get('window').height;
 
 const Profile = ({navigation}) => {
   const {avatarUri, setAvatarUri} = useAvatar();
-  const [isLoading, setIsLoading] = useState(true); // Initialize loading state
-  const [userData, setUserData] = useState(null); // Initialize user data state
+  const [isLoading, setIsLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
 
   const loadSavedAvatar = async () => {
     try {
@@ -46,9 +46,8 @@ const Profile = ({navigation}) => {
   }, []);
 
   const fetchUserData = async () => {
-    const userId = await AsyncStorage.getItem('userId');
     const token = await AsyncStorage.getItem('userToken');
-    setIsLoading(true); // Set loading state to true while fetching
+    setIsLoading(true);
 
     axios
       .get(`https://med-adherence-app.vercel.app/api/accounts/`, {
@@ -57,17 +56,15 @@ const Profile = ({navigation}) => {
         },
       })
       .then(response => {
-        // Handle the successful response here
         console.log('User Profile:', response.data);
         console.log('User Profile:', token);
-        setUserData(response.data); // Set user data in state
+        setUserData(response.data);
       })
       .catch(error => {
-        // Handle any errors that occurred during the request
         console.error('Error:', error);
       })
       .finally(() => {
-        setIsLoading(false); // Set loading state to false when request completes
+        setIsLoading(false);
       });
   };
 

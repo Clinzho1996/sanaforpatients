@@ -138,19 +138,30 @@ const Account = ({navigation}) => {
   const handleProfileUpdate = async () => {
     setIsLoading(true);
     try {
+      const token = await AsyncStorage.getItem('userToken');
       const response = await axios.patch(
         `https://med-adherence-app.vercel.app/api/accounts/${userId}/update/`,
         {
           full_name: name,
           email: email,
-          phone: '',
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
       );
       console.log('Register: ', response.data);
       Alert.alert('Success', response.data.message);
+      // Update userData state with the new details
+      setUserData({
+        ...userData,
+        full_name: name,
+        email: email,
+      });
     } catch (error) {
       console.log('Error:', error.response.data);
-      Alert.alert('Error', error);
+      Alert.alert('Error', error.response.data.email[0]);
     } finally {
       setIsLoading(false);
     }
@@ -303,6 +314,7 @@ const Account = ({navigation}) => {
           alignItems: 'center',
         }}>
         <TouchableOpacity
+          onPress={handleProfileUpdate}
           style={{
             backgroundColor: '#fff',
             paddingHorizontal: 120,

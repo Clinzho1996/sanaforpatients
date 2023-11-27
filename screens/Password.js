@@ -51,8 +51,8 @@ const Password = ({navigation}) => {
       Alert.alert('Success', response.data.message);
       navigation.navigate('Login');
     } catch (error) {
-      console.log('Error:', error.response.data); // Log the error response
-      Alert.alert('Error', error.response.data.message); // Show the error message to the user
+      console.log('Error:', error.response.data); 
+      Alert.alert('Error', error.response.data.message); 
     } finally {
       setIsLoading(false);
     }

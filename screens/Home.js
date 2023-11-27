@@ -16,17 +16,21 @@ const width = Dimensions.get('window').width;
 
 const Home = ({navigation}) => {
   const [reminderData, setReminderData] = useState({});
+  const [visible, setVisible] = React.useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [disabledStates, setDisabledStates] = useState({});
   const [selectedItemId, setSelectedItemId] = useState(null);
 
   const showModal = itemId => {
+    setVisible(true);
     setSelectedItemId(itemId);
     setButtonDisabled(true);
   };
 
   const hideModal = () => {
+    setVisible(false);
     setSelectedItemId(null);
+    setButtonDisabled(false);
   };
 
   const containerStyle = {
@@ -56,7 +60,7 @@ const Home = ({navigation}) => {
           setUserId(response.data.pk);
         })
         .catch(error => {
-          console.error('Error:', error);
+          console.error('Error:', error.response.data.detail);
         })
         .finally(() => {
           setIsLoading(false);
@@ -67,15 +71,12 @@ const Home = ({navigation}) => {
   }, []);
 
   useEffect(() => {
+    if (!userId) {
+      // If userId is not available yet, return from this function
+      return;
+    }
     const fetchMedicationData = async () => {
       const token = await AsyncStorage.getItem('userToken');
-
-      // Check if userId is available before making the API call
-      if (!userId || !token) {
-        console.error('User ID or token not found in AsyncStorage');
-        navigation.navigate('Login');
-        return;
-      }
 
       try {
         const response = await axios.get(
@@ -236,7 +237,7 @@ const Home = ({navigation}) => {
                 key={item.id.toString()}>
                 <Portal>
                   <Modal
-                    visible={selectedItemId === item.id}
+                    visible={visible}
                     onDismiss={hideModal}
                     contentContainerStyle={containerStyle}>
                     <View style={{backgroundColor: 'white', padding: 20}}>
@@ -262,7 +263,7 @@ const Home = ({navigation}) => {
                             hideModal();
                             const updatedDisabledStates = {
                               ...disabledStates,
-                              [item.id]: true, // Update the disabled state for the specific item
+                              [item.id]: true,
                             };
                             setDisabledStates(updatedDisabledStates);
                             handleMedicationTaken(item.id);
@@ -328,7 +329,7 @@ const Home = ({navigation}) => {
                           borderRadius: 20,
                           opacity: item.taken ? 0.6 : 1,
                         }}
-                        disabled={item.taken}>
+                        disabled={buttonDisabled || item.taken}>
                         <Text style={{color: '#fff', fontSize: 12}}>
                           {item.taken ? 'Taken' : 'Take now'}
                         </Text>

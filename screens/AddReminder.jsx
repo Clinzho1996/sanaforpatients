@@ -175,19 +175,18 @@ const AddReminder = ({navigation}) => {
         })
         .flat();
 
+      PushNotification.cancelAllLocalNotifications();
       for (const date of selectedDate) {
         for (const time of selectedTimes) {
           const scheduledDateTime = new Date(date);
           scheduledDateTime.setHours(time.hours, time.minutes, 0, 0);
 
-          // Check if the scheduled time is in the future
           if (scheduledDateTime > new Date()) {
-            // Schedule a notification for each selected date and time in the future
             PushNotification.localNotificationSchedule({
               channelId: 'sana',
               title: 'Medication Reminder',
-              message: `Don't forget to take ${name}`, // Use the medication name here
-              date: scheduledDateTime, // Set the date and time for the notification
+              message: `Don't forget to take ${name}`,
+              date: scheduledDateTime,
               importance: Importance.HIGH,
             });
           }

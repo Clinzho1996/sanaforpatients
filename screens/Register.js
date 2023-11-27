@@ -52,12 +52,7 @@ const Register = ({navigation}) => {
       // Check if response.data.id exists before setting it in AsyncStorage
 
       await AsyncStorage.setItem('userId', String(response.data.user.pk));
-      await AsyncStorage.setItem(
-        'userName',
-        String(response.data.user.full_name),
-      );
       await AsyncStorage.setItem('userToken', response.data.token.access);
-      await AsyncStorage.setItem('refreshToken', response.data.token.refresh);
       navigation.navigate('Main');
 
       console.log('Register: ', response.data);
@@ -134,7 +129,7 @@ const Register = ({navigation}) => {
             marginTop: 20,
           }}>
           <TextInput
-            placeholder="name@example.com"
+            placeholder="Your Email Address"
             placeholderTextColor="#131313"
             onChangeText={text => setEmail(text)}
             style={{color: '#131313', fontFamily: 'Inter-Bold', fontSize: 16}}

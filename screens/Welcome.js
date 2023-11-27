@@ -19,61 +19,13 @@ const Welcome = ({navigation}) => {
   const checkToken = async () => {
     try {
       const userToken = await AsyncStorage.getItem('userToken');
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
-
-      if (!userToken || !refreshToken) {
-        navigation.navigate('Onboarding');
-        return;
-      }
-
-      const isTokenExpired = token => {
-        const tokenParts = token.split('.');
-        if (tokenParts.length < 2) {
-          // Invalid token format, handle error or return default expiry
-          return true;
-        }
-
-        const payload = JSON.parse(decode(tokenParts[1]));
-        if (!payload || !payload.exp) {
-          return true;
-        }
-
-        const currentTimestamp = Math.floor(Date.now() / 1000);
-        return payload.exp < currentTimestamp;
-      };
-
-      if (isTokenExpired(userToken)) {
-        // Token has expired, refresh logic here
-        const newAccessToken = await refreshAccessToken(refreshToken);
-        if (!newAccessToken) {
-          // Handle token refresh failure, navigate to login
-          navigation.navigate('Login');
-          return;
-        }
-        // Token refreshed successfully, proceed to Main or necessary screen
-        navigation.navigate('Main');
+      if (userToken) {
+        navigation.replace('Main');
       } else {
-        navigation.navigate('Main');
+        navigation.replace('Onboarding');
       }
     } catch (error) {
       console.log('Error checking token:', error);
-    }
-  };
-
-  const refreshAccessToken = async refreshToken => {
-    try {
-      const response = await axios.post(
-        'https://med-adherence-app.vercel.app/api/accounts/token/refresh/',
-        {
-          refresh: refreshToken,
-        },
-      );
-      const newAccessToken = response.data.access; // Extract new access token from response
-      await AsyncStorage.setItem('userToken', newAccessToken); // Save the new access token
-      return newAccessToken; // Return the refreshed access token
-    } catch (error) {
-      console.error('Error refreshing access token:', error);
-      return null;
     }
   };
 
